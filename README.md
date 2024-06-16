@@ -1,5 +1,5 @@
 # WIFI MANAGER (MicroPython)
-Simple WIFI MANAGER MicroPython script.
+Simple WIFI MANAGER MicroPython script for Micro-Controllers (Raspberry Pi Pico W - ESP32...).
 <br><br>
 Possibility to connect to the Wi-Fi network saved in the wifi_credentials.json file or create an Access Point to configure the device's Wi-Fi connection from another device.
 <br><br>
