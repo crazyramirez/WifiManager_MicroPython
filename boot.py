@@ -1,4 +1,5 @@
 import wifimanager
+import time
 
 # Main
 def main():
@@ -8,8 +9,8 @@ def main():
         print("Connected")
     else:
         print("False")
+        wifimanager.ap_mode()
         
-    # wifimanager.ap_mode()
 
 if __name__ == '__main__':
     main()

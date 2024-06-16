@@ -26,3 +26,7 @@ Use the following functions:
 
 ## Create Access Point
     wifimanager.ap_mode()
+
+You can use these methods in different ways.
+<br>
+For example, as you can see in the boot.int file, you can boot your device and have it try to connect to the stored Wifi network, if the connection fails it will open the ap mode automatically.

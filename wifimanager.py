@@ -100,22 +100,22 @@ def read_html_file(filename):
         print("Error reading HTML file:", e)
         return "<html><body><h1>Error: HTML file not found</h1></body></html>"
 
+SSID = "Wifi Config"
+PASSWORD = "123456789"
 # Enter AP mode
 AUTO_RESET_TIME = 120
 def ap_mode():
+    print("---- ----")
     print("Starting AP mode...")
     # Ensure STA Mode is disabled
     disable_sta_mode()
     
     # Reset the AP mode interface
     ap = network.WLAN(network.AP_IF)
-    if ap.active():
-        ap.active(False)
-    time.sleep(2)
 
     # Config AP Mode
-    ap.config(essid='Crypto Dash', authmode=network.AUTH_WPA2_PSK, password='123456789')
     ap.active(True)
+    ap.config(essid=SSID, authmode=network.AUTH_WPA2_PSK, password=PASSWORD)
     
     close_existing_connections()
 
@@ -129,8 +129,13 @@ def ap_mode():
         return
     
     print('AP mode activated successfully')
-    print(ap.ifconfig())
-    
+    print("---- ----")
+    print(f'Connect to {SSID} Wifi from other Device')
+    print(f'PASSWORD: {PASSWORD}')
+    print(f'Open your Browser and Enter')
+    print(f'URL: http://{ap.ifconfig()[0]}')
+    print("---- ----")
+
     # Read HTML File
     config_page = read_html_file('config_page.html')
 
@@ -228,3 +233,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
