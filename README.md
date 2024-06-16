@@ -15,6 +15,9 @@ Copy the script to your device (Raspberry Pi Pico W - ESP32...)
 
 Use the following functions:
 
+## Import WifiManager
+    import wifimanager
+    
 ## Connect to Wifi
     wifimanager.connect_wifi()
 
