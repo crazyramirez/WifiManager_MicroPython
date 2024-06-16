@@ -5,6 +5,8 @@ Possibility to connect to the Wi-Fi network saved in the wifi_credentials.json f
 <br><br>
 Nice interface using HTML - CSS - JS to establish the connection on your device.
 <br>
+Auto Reset from AP Mode after 120 seconds
+<br>
 Modify the config_page.html file to adapt it to your needs
 <br><br>
 <img src="./images/wifi_config.jpg" alt="CRYPTO DASHBOARD Demo 1" width="100%"/>
