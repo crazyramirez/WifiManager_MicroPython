@@ -11,8 +11,8 @@ Copy the script to your device (Raspberry Pi Pico W - ESP32...)
 
 Use the following functions:
 
-- Connect to Wifi
-wifimanager.connect_wifi()
+## Connect to Wifi
+    wifimanager.connect_wifi()
 
-- Create Access Point
-wifimanager.ap_mode()
+## Create Access Point
+    wifimanager.ap_mode()
