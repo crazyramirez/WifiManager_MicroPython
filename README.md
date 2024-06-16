@@ -5,6 +5,7 @@ Possibility to connect to the Wi-Fi network saved in the wifi_credentials.json f
 
 ## INSTALL
 Configure your device using Thonny for example.
+<br>
 Copy the script to your device (Raspberry Pi Pico W - ESP32...)
 
 Use the following functions:
