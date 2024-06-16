@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+    <title>WiFi Config</title>
+    <style>
+        html {
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(45deg, #4e54c8, #d1d3ff);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 320px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        h2, h5 {
+            text-align: center;
+            color: #333333;
+        }
+        .input-container {
+            margin: 10px 0px 20px;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #797979;
+            background-color: transparent;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background-color: #e9e9e9;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #loader {
+            position: relative;
+            transform: translateX(-50%);
+            margin-left: 50%;
+            width: 30px;
+            height: 25px;
+            --m:no-repeat linear-gradient(90deg,#000 70%,#0000 0);
+            -webkit-mask: 
+            var(--m) calc(0*100%/4) 100%/calc(100%/5) calc(1*100%/5),
+            var(--m) calc(1*100%/4) 100%/calc(100%/5) calc(2*100%/5),
+            var(--m) calc(2*100%/4) 100%/calc(100%/5) calc(3*100%/5),
+            var(--m) calc(3*100%/4) 100%/calc(100%/5) calc(4*100%/5),
+            var(--m) calc(4*100%/4) 100%/calc(100%/5) calc(5*100%/5);
+            mask: 
+            var(--m) calc(0*100%/4) 100%/calc(100%/5) calc(1*100%/5),
+            var(--m) calc(1*100%/4) 100%/calc(100%/5) calc(2*100%/5),
+            var(--m) calc(2*100%/4) 100%/calc(100%/5) calc(3*100%/5),
+            var(--m) calc(3*100%/4) 100%/calc(100%/5) calc(4*100%/5),
+            var(--m) calc(4*100%/4) 100%/calc(100%/5) calc(5*100%/5);
+            background: linear-gradient(#514b82 0 0) left/0% 100% no-repeat #ddd;
+            animation: l14 2s infinite steps(6);
+        }
+        @keyframes l14 {
+            100% {background-size: 120% 100%}
+        }
+        /* Basic styling for the modal */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            padding-top: 100px; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+            box-sizing: border-box;
+        }
+        .modal-content {
+            box-sizing: border-box;
+            line-height: 1.5rem;
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 280px;
+            text-align: center;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function showModal(title, body) {
+                var modal = document.getElementById("myModal");
+                var span = document.getElementsByClassName("close")[0];
+                document.getElementById("modalTitle").innerText = title;
+                document.getElementById("modalBody").innerText = body;
+                modal.style.display = "block";
+                span.onclick = function() {
+                    modal.style.display = "none";
+                }
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
+            }
+            fetch('/wifi-networks')
+                .then(response => response.json())
+                .then(networks => {
+                    const ssidSelect = document.getElementById('ssid');
+                    networks.forEach(network => {
+                        const option = document.createElement('option');
+                        option.value = network;
+                        option.text = network;
+                        ssidSelect.appendChild(option);
+                    });
+                    setTimeout(() => {
+                        document.getElementById("loader").style.display = "none";
+                    }, 1000);
+                })
+                .catch(error => console.error('Error loading WiFi networks:', error));
+            document.getElementById('configForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const data = {};
+                formData.forEach((value, key) => data[key] = value);
+                fetch('/configure', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => response.text())
+                .then(data => {
+                    console.log('Success:', data);
+                    let ssid = document.getElementById('ssid').value;
+                    let pass = document.getElementById('password').value;
+                    showModal(`Configuration`, 
+                    `SSID: ${ssid}\nPass: ${pass}`);
+                    setTimeout(()=> {
+                        var modal = document.getElementById("myModal");
+                        modal.style.display = "none";
+                    }, 3000);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div id="loader"></div>
+        <h2>WiFi Config</h2>
+        <h5>Leave it empty if you're connected</h5>
+        <form id="configForm">
+            <div class="input-container">
+                <label for="ssid">SSID</label>
+                <select id="ssid" name="ssid"></select>
+            </div>
+            <div class="input-container">
+                <label for="password">PASSWORD</label>
+                <input type="text" id="password" name="password">
+            </div>
+            <input type="submit" value="SUBMIT">
+        </form>
+    </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Title</h2>
+            <p id="modalBody">Some text in the Modal..</p>
+        </div>
+    </div>
+</body>
+</html>
