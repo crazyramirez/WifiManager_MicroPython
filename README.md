@@ -33,4 +33,4 @@ For example, as you can see in the **boot.py** file, you can boot your device an
 <br><br>
 Look at the Log and you will see the different configuration states.
 <br><br>
-If you have a TFT screen or similar (IE.- ili9341), you can display the connection status on the screen.
+If you have a TFT screen or similar (IE.- ili9341), you can display the connection status on the screen using the corresponding drivers from the manufacturer.
