@@ -30,3 +30,7 @@ Use the following functions:
 You can use these methods in different ways.
 <br>
 For example, as you can see in the **boot.py** file, you can boot your device and try to connect to the previously stored Wifi network (wifi_credentials.json), if the connection fails it will open the ap mode automatically.
+<br><br>
+Look at the Log and you will see the different configuration states.
+<br><br>
+If you have a TFT screen or similar, you can display the connection status on the screen.
