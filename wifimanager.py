@@ -53,7 +53,7 @@ def connect_wifi():
             print('Waiting for connection...')
             time.sleep(1)
         print('Failed to connect to WiFi: Timeout')
-        return True
+        return False
     else:
         return False
         print("No SSID or Password")
