@@ -3,9 +3,13 @@ Simple WIFI MANAGER MicroPython script for Micro-Controllers (Raspberry Pi Pico 
 <br><br>
 Possibility to connect to the Wi-Fi network saved in the wifi_credentials.json file or create an Access Point to configure the device's Wi-Fi connection from another device.
 <br><br>
+Stores the last 5 Wi-Fi connections
+<br><br>
+In the "connect_wifi" function, it scans the available networks and checks the signal quality to connect to the best option previously stored
+<br><br>
 Auto-Reset from AP Mode after 120 seconds
 <br><br>
-Nice interface using HTML - CSS - JS to establish the connection on your device.
+Nice and clen interface using HTML - CSS - JS to establish the connection on your device.
 <br>
 Modify the config_page.html file to adapt it to your needs
 <br><br>
