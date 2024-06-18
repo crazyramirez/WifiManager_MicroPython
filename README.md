@@ -7,6 +7,8 @@ Stores the last 5 Wi-Fi connections
 <br><br>
 In the "connect_wifi" function, it scans the available networks and checks the signal quality to connect to the best option previously stored
 <br><br>
+Every 20 seconds a timer checks the connection.
+<br><br>
 Auto-Reset from AP Mode after 120 seconds
 <br><br>
 Nice and clen interface using HTML - CSS - JS to establish the connection on your device.
