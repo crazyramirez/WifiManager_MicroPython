@@ -5,7 +5,7 @@ Possibility to connect to the Wi-Fi networks saved in the wifi_credentials.json 
 <br><br>
 Stores the last 5 Wi-Fi connections.
 <br><br>
-In the "connect_wifi" function, it scans the available networks and checks the signal quality to connect automatically to the best option previously stored.
+In the "connect_wifi" function, it scans the available networks and checks the signal quality to connect automatically to the best option previously stored in wifi_credentials.json.
 <br><br>
 Every 20 seconds a timer checks the connection.
 <br><br>
