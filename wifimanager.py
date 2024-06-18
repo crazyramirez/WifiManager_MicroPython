@@ -5,58 +5,85 @@ import socket
 import time
 import machine
 
+# Declaramos networks como global
+networks = []
+
 # Save Wi-Fi credentials
 def save_credentials(ssid, password):
-    credentials = {'ssid': ssid, 'password': password}
+    try:
+        with open('wifi_credentials.json', 'r') as f:
+            credentials = json.load(f)
+    except (OSError, ValueError):
+        credentials = []
+    new_cred = {'ssid': ssid, 'password': password}
+    credentials = [new_cred] + [cred for cred in credentials if cred['ssid'] != ssid]
+    if len(credentials) > 5:
+        credentials = credentials[:5]
     with open('wifi_credentials.json', 'w') as f:
         json.dump(credentials, f)
 
 # Load Wi-Fi credentials
-def load_credentials():
+def load_all_credentials():
     try:
         with open('wifi_credentials.json', 'r') as f:
-            credentials = json.load(f)
-        return credentials['ssid'], credentials['password']
-    except OSError:
-        return None, None
+            return json.load(f)
+    except (OSError, ValueError):
+        return []
+
+def load_credentials():
+    credentials = load_all_credentials()
+    if credentials:
+        return credentials[0]['ssid'], credentials[0]['password']
+    return None, None
 
 # Remove Credentials
 def remove_credentials():
     try:
         os.remove('wifi_credentials.json')
-        print("Wifi Credentials Removed")
+        print("WiFi Credentials Removed")
     except Exception as e:
-        print("Error removing Wifi Credentials file:", e)
+        print("Error removing WiFi Credentials file:", e)
 
 # Connect to Wi-Fi
 def connect_wifi():
-    ssid, password = load_credentials()
-    if ssid and password:
-        wlan = network.WLAN(network.STA_IF)
-        wlan.active(False)
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    networks = wlan.scan()
+        
+    if not networks:
+        print('No WiFi networks found')
+        return False
+
+    best_network = max(networks, key=lambda x: x[3])  # Signal strength is at index 3
+    ssid = best_network[0].decode('utf-8')
+    credentials = load_all_credentials()
+    password = None
+    for cred in credentials:
+        if cred['ssid'] == ssid:
+            password = cred['password']
+            break
+    if not password:
+        print('No password found for the best network')
+        return False
+    wlan.connect(ssid, password)
+    max_wait = 10
+    while max_wait > 0:
+        status = wlan.status()
+        if status == network.STAT_GOT_IP:
+            print('Connected to WiFi:', wlan.ifconfig())
+            save_credentials(ssid, password)
+            return True
+        elif status == network.STAT_WRONG_PASSWORD:
+            print('Wrong WiFi password')
+            return False
+        elif status == network.STAT_NO_AP_FOUND:
+            print('WiFi SSID not found')
+            return False
+        max_wait -= 1
+        print('Waiting for connection...')
         time.sleep(1)
-        wlan.active(True)
-        wlan.connect(ssid, password)
-        max_wait = 10
-        while max_wait > 0:
-            status = wlan.status()
-            if status == network.STAT_GOT_IP:
-                print('Connected to WiFi:', wlan.ifconfig())
-                return True
-            elif status == network.STAT_WRONG_PASSWORD:
-                print('Wrong WiFi password')
-                return False
-            elif status == network.STAT_NO_AP_FOUND:
-                print('WiFi SSID not found')
-                return False
-            max_wait -= 1
-            print('Waiting for connection...')
-            time.sleep(1)
-        print('Failed to connect to WiFi: Timeout')
-        return False
-    else:
-        return False
-        print("No SSID or Password")
+    print('Failed to connect to WiFi: Timeout')
+    return False
 
 # Disable STA mode
 def disable_sta_mode():
@@ -84,7 +111,7 @@ def handle_configure(request):
             return None, None
     return None, None
 
-# Scan Wifi Networks
+# Scan Wi-Fi Networks
 def scan_wifi_networks():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
@@ -100,7 +127,7 @@ def read_html_file(filename):
         print("Error reading HTML file:", e)
         return "<html><body><h1>Error: HTML file not found</h1></body></html>"
 
-SSID = "Wifi Config"
+SSID = "WiFi Config"
 PASSWORD = "123456789"
 # Enter AP mode
 AUTO_RESET_TIME = 120
@@ -115,7 +142,7 @@ def ap_mode():
 
     # Config AP Mode
     ap.active(True)
-    ap.config(essid=SSID, authmode=network.AUTH_WPA2_PSK, password=PASSWORD)
+    ap.config(essid=SSID, authmode=network.AUTH_W2_PSK, password=PASSWORD)
     
     close_existing_connections()
 
@@ -130,7 +157,7 @@ def ap_mode():
     
     print('AP mode activated successfully')
     print("---- ----")
-    print(f'Connect to {SSID} Wifi from other Device')
+    print(f'Connect to {SSID} WiFi from other Device')
     print(f'PASSWORD: {PASSWORD}')
     print(f'Open your Browser and Enter')
     print(f'URL: http://{ap.ifconfig()[0]}')
@@ -202,6 +229,7 @@ def ap_mode():
             print("120 seconds have passed, resetting...")
             machine.reset()
 
+# Close Existing Connection
 def close_existing_connections():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -211,15 +239,7 @@ def close_existing_connections():
         print("Closing existing socket connections...")
         s.close()
 
-# Verificación del estado de AP
-def verify_ap_mode():
-    ap = network.WLAN(network.AP_IF)
-    if ap.active():
-        print('AP mode is active')
-    else:
-        print('AP mode is not active')
-
-# Verificación de la conexión Wi-Fi
+# Verify Wi-Fi connection status
 def print_network_status():
     wlan = network.WLAN(network.STA_IF)
     if wlan.isconnected():
@@ -227,9 +247,30 @@ def print_network_status():
     else:
         print('Network not connected')
 
+# Periodic Wifi Check        
+def periodic_wifi_check(timer):
+    print('-- Timer Checking WiFi --')
+    sta_if = network.WLAN(network.STA_IF)
+    ap_if = network.WLAN(network.AP_IF)
+    # Check if AP mode is active
+    if ap_if.active():
+        print('AP mode is active, skipping WiFi check')
+        return
+    if sta_if.isconnected():
+        ssid = sta_if.config('essid')
+        print(f'WiFi Connected to: {ssid}')
+    else:
+        print('WiFi not connected, attempting to connect...')
+        if not connect_wifi():
+            print('Failed to connect to WiFi')
+
+# Configure timer to check WiFi connection every 20 seconds
+timer = machine.Timer(-1)
+timer.init(period=20000, mode=machine.Timer.PERIODIC, callback=periodic_wifi_check)
+
 # Main
 def main():
-    print("INIT Wifi Manager")
+    print("INIT WiFi Manager")
 
 if __name__ == '__main__':
     main()
