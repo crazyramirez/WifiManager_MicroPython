@@ -1,3 +1,5 @@
+<a href="https://www.viseni.com" target="_blank"><img src="https://www.viseni.com/_demos_/viseni-logo-white.webp" style="width: 200px; margin-bottom: 50px"></a>
+
 # WIFI MANAGER (MicroPython)
 Simple WIFI MANAGER MicroPython script for Micro-Controllers (Raspberry Pi Pico W - ESP32...).
 <br><br>
